@@ -31,26 +31,43 @@ interface Task {
   name: string
   date: string
   frequency: Frequency
-  completed: boolean
+  completed: boolean,
+  history: string[]
 }
 
 export default function TasksPage() {
   const [tasks, setTasks] = React.useState<Task[]>([
-    { id: "1", name: "Review weekly goals", date: new Date().toISOString(), frequency: "weekly", completed: false },
+    {
+      id: "1",
+      name: "Review weekly goals",
+      date: new Date().toISOString(),
+      frequency: "weekly",
+      completed: false,
+      history: [],
+    },
     {
       id: "2",
       name: "Monthly team meeting",
       date: addDays(new Date(), 5).toISOString(),
       frequency: "monthly",
       completed: false,
+      history: [],
     },
-    { id: "3", name: "Daily standup", date: new Date().toISOString(), frequency: "daily", completed: false },
+    {
+      id: "3",
+      name: "Daily standup",
+      date: new Date().toISOString(),
+      frequency: "daily",
+      completed: false,
+      history: []
+    }, 
     {
       id: "4",
       name: "Yearly planning",
       date: addMonths(new Date(), 2).toISOString(),
       frequency: "yearly",
       completed: false,
+      history: [],
     },
     {
       id: "5",
@@ -58,6 +75,7 @@ export default function TasksPage() {
       date: addDays(new Date(), 2).toISOString(),
       frequency: "weekly",
       completed: false,
+      history: [],
     },
     {
       id: "6",
@@ -65,6 +83,7 @@ export default function TasksPage() {
       date: addMonths(new Date(), 1).toISOString(),
       frequency: "monthly",
       completed: false,
+      history: [],
     },
   ])
 
@@ -76,11 +95,17 @@ export default function TasksPage() {
       const task = currentTasks[taskIndex]
       const newTasks = [...currentTasks]
 
-      // Mark current task as completed
-      newTasks[taskIndex] = { ...task, completed: true }
+
+      
+
+      // get current date in yyyy-mm-dd format
+      const currentDate = new Date().toISOString().split("T")[0]
+      task.history.push(currentDate)
+    
+    
 
       // Create next task based on frequency
-      const currentDate = parseISO(task.date)
+      //const currentDate = parseISO(task.date)
       let nextDate: Date
 
       switch (task.frequency) {
@@ -98,14 +123,7 @@ export default function TasksPage() {
           break
       }
 
-      // Add new task
-      newTasks.push({
-        id: Date.now().toString(),
-        name: task.name,
-        date: nextDate.toISOString(),
-        frequency: task.frequency,
-        completed: false,
-      })
+      task.date = nextDate.toISOString()
 
       return newTasks
     })
