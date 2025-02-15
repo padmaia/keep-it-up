@@ -1,101 +1,207 @@
-import Image from "next/image";
+"use client"
 
-export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+import * as React from "react"
+import {
+  addDays,
+  addMonths,
+  addWeeks,
+  addYears,
+  format,
+  isThisMonth,
+  isThisWeek,
+  isThisYear,
+  isToday,
+  parseISO,
+} from "date-fns"
+import { CalendarIcon } from "lucide-react"
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
-  );
+import { Button } from "@/components/ui/button"
+import { Calendar } from "@/components/ui/calendar"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { cn } from "@/lib/utils"
+import { Badge } from "@/components/ui/badge"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+
+type Frequency = "daily" | "weekly" | "monthly" | "yearly"
+
+interface Task {
+  id: string
+  name: string
+  date: string
+  frequency: Frequency
+  completed: boolean
 }
+
+export default function TasksPage() {
+  const [tasks, setTasks] = React.useState<Task[]>([
+    { id: "1", name: "Review weekly goals", date: new Date().toISOString(), frequency: "weekly", completed: false },
+    {
+      id: "2",
+      name: "Monthly team meeting",
+      date: addDays(new Date(), 5).toISOString(),
+      frequency: "monthly",
+      completed: false,
+    },
+    { id: "3", name: "Daily standup", date: new Date().toISOString(), frequency: "daily", completed: false },
+    {
+      id: "4",
+      name: "Yearly planning",
+      date: addMonths(new Date(), 2).toISOString(),
+      frequency: "yearly",
+      completed: false,
+    },
+    {
+      id: "5",
+      name: "Weekly report",
+      date: addDays(new Date(), 2).toISOString(),
+      frequency: "weekly",
+      completed: false,
+    },
+    {
+      id: "6",
+      name: "Quarterly review",
+      date: addMonths(new Date(), 1).toISOString(),
+      frequency: "monthly",
+      completed: false,
+    },
+  ])
+
+  const completeTask = (taskId: string) => {
+    setTasks((currentTasks) => {
+      const taskIndex = currentTasks.findIndex((t) => t.id === taskId)
+      if (taskIndex === -1) return currentTasks
+
+      const task = currentTasks[taskIndex]
+      const newTasks = [...currentTasks]
+
+      // Mark current task as completed
+      newTasks[taskIndex] = { ...task, completed: true }
+
+      // Create next task based on frequency
+      const currentDate = parseISO(task.date)
+      let nextDate: Date
+
+      switch (task.frequency) {
+        case "daily":
+          nextDate = addDays(currentDate, 1)
+          break
+        case "weekly":
+          nextDate = addWeeks(currentDate, 1)
+          break
+        case "monthly":
+          nextDate = addMonths(currentDate, 1)
+          break
+        case "yearly":
+          nextDate = addYears(currentDate, 1)
+          break
+      }
+
+      // Add new task
+      newTasks.push({
+        id: Date.now().toString(),
+        name: task.name,
+        date: nextDate.toISOString(),
+        frequency: task.frequency,
+        completed: false,
+      })
+
+      return newTasks
+    })
+  }
+
+  const updateTaskDate = (taskId: string, newDate: Date) => {
+    setTasks((currentTasks) =>
+      currentTasks.map((task) => (task.id === taskId ? { ...task, date: newDate.toISOString() } : task)),
+    )
+  }
+
+  const filterTasks = (filterFn: (date: Date) => boolean) => {
+    return tasks
+      .filter((task) => !task.completed && filterFn(parseISO(task.date)))
+      .sort((a, b) => parseISO(a.date).getTime() - parseISO(b.date).getTime())
+  }
+
+  const TaskTable = ({ tasks }: { tasks: Task[] }) => (
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead className="w-[50px]">Done</TableHead>
+          <TableHead>Task</TableHead>
+          <TableHead className="w-[120px]">Frequency</TableHead>
+          <TableHead className="w-[180px]">Date</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {tasks.map((task) => (
+          <TableRow key={task.id}>
+            <TableCell>
+              <Checkbox checked={task.completed} onCheckedChange={() => completeTask(task.id)} />
+            </TableCell>
+            <TableCell>{task.name}</TableCell>
+            <TableCell>
+              <Badge variant="secondary" className="capitalize">
+                {task.frequency}
+              </Badge>
+            </TableCell>
+            <TableCell>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className={cn("w-full justify-start text-left font-normal")}>
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {format(parseISO(task.date), "PPP")}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={parseISO(task.date)}
+                    onSelect={(date) => date && updateTaskDate(task.id, date)}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  )
+
+  const todayTasks = filterTasks(isToday)
+  const thisWeekTasks = filterTasks((date) => isThisWeek(date) && !isToday(date))
+  const thisMonthTasks = filterTasks((date) => isThisMonth(date) && !isThisWeek(date))
+  const thisYearTasks = filterTasks((date) => isThisYear(date) && !isThisMonth(date))
+
+  return (
+    <div className="w-full p-8 space-y-10">
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight mb-2">Tasks</h1>
+        <p className="text-muted-foreground">Manage your recurring tasks</p>
+      </div>
+
+      <div className="space-y-8">
+        {[
+          { title: "Today", tasks: todayTasks },
+          { title: "This Week", tasks: thisWeekTasks },
+          { title: "This Month", tasks: thisMonthTasks },
+          { title: "This Year", tasks: thisYearTasks },
+        ].map(
+          ({ title, tasks }) =>
+            tasks.length > 0 && (
+              <Card key={title}>
+                <CardHeader>
+                  <CardTitle>{title}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <TaskTable tasks={tasks} />
+                </CardContent>
+              </Card>
+            ),
+        )}
+      </div>
+    </div>
+  )
+}
+
