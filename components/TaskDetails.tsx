@@ -49,7 +49,7 @@ export default function TaskDetails({task}: {task: Task}) {
             <AlertDialogHeader>
               <AlertDialogTitle>Are you sure?</AlertDialogTitle>
               <AlertDialogDescription>
-                This will permanently delete the task "{task.name}" and all of its history.
+                {`This will permanently delete the task "${task.name}" and all of its history.`}
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
