@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "migrate:pg:dev": "dotenv -e .env.dev -- pnpx prisma migrate dev --name first_prisma_migration"
+    "migrate:pg:dev": "dotenv -e .env.dev -- pnpx prisma migrate dev --name first_prisma_migration",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@prisma/client": "6.3.1",
