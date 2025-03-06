@@ -1,12 +1,10 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-
-import { createClient } from "@/utils/supabase/server";
+import { revalidatePath } from "next/cache";
 
 export async function login(formData: FormData) {
-  console.log("GOT HERE");
   const supabase = await createClient();
 
   // type-casting here for convenience
@@ -15,18 +13,13 @@ export async function login(formData: FormData) {
     email: formData.get("email") as string,
     password: formData.get("password") as string,
   };
-  console.log("DATA", data);
 
   const { error } = await supabase.auth.signInWithPassword(data);
-
-  console.log("GOT HERE 2");
 
   if (error) {
     console.log("there was an error", error);
     return { success: false, message: error.message };
   }
-
-  console.log("should be redirecting");
 
   revalidatePath("/tasks", "layout");
   redirect("/tasks");
@@ -50,4 +43,10 @@ export async function signup(formData: FormData) {
 
   revalidatePath("/", "layout");
   redirect("/");
+}
+
+export async function logout() {
+  const supabase = await createClient();
+  await supabase.auth.signOut();
+  redirect("/login");
 }

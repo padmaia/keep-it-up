@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 
-import { login } from "./actions"
+import { login } from "@/actions/auth"
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")

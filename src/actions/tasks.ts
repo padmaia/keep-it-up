@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { PrismaClient, Prisma } from "@prisma/client";
-import { createClient } from "@/utils/supabase/server";
+import { createClient } from "@/lib/supabase/server";
 import { addDays } from "date-fns";
 
 const prisma = new PrismaClient();
