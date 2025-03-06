@@ -9,6 +9,8 @@ import * as React from "react"
 
 import { getTasks } from "@/actions/tasks"
 
+export const dynamic = 'force-dynamic'
+
 export default async function HistoryPage() {
   const tasks = await getTasks()
   
