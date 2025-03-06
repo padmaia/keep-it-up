@@ -17,12 +17,16 @@ async function ensureAuthenticated() {
 }
 
 export async function getTasks() {
+  await ensureAuthenticated();
+
   return prisma.task.findMany({
     orderBy: { date: "asc" },
   });
 }
 
 export async function getTask(id: string) {
+  await ensureAuthenticated();
+
   return prisma.task.findUnique({
     where: { id },
   });
